@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-deployment
+spec:
+  replicas: {{ .Values.notificationservice.replicaCount }}
+  selector:
+    matchLabels:
+      app: notification-service-app
+  template:
+    metadata:
+      labels:
+        app: notification-service-app
+    spec:
+      containers:
+        - name: notification-service
+          image: {{ .Values.notificationservice.image }}
+          env:
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: ilibrary-config
+                  key: DB_URL
+            - name: DB_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: ilibrary-config
+                  key: DB_SCHEMA
+            - name: KAFKA_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ilibrary-config
+                  key: KAFKA_HOST
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ilibrary-config-secret
+                  key: DB_USER
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: ilibrary-config-secret
+                  key: DB_PASS
+          ports:
+            - containerPort: {{ .Values.notificationservice.service.port }}
+              name: web
+          imagePullPolicy: IfNotPresent
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+spec:
+  selector:
+    app: notification-service-app
+  ports:
+    - protocol: TCP
+      port: {{ .Values.notificationservice.service.port }}
+      targetPort: web
+      name: web
+  type: {{ .Values.notificationservice.service.type }}

@@ -1,0 +1,6 @@
+fullnameOverride: postgres
+postgresqlUsername: postgres
+postgresqlPassword: postgres
+postgresqlDatabase: ilibrary
+persistence:
+  enabled: false

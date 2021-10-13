@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-deployment
+spec:
+  replicas: {{ .Values.userservice.replicaCount }}
+  selector:
+    matchLabels:
+      app: user-service-app
+  template:
+    metadata:
+      labels:
+        app: user-service-app
+    spec:
+      containers:
+        - name: user-service
+          image: {{ .Values.userservice.image }}
+          env:
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: ilibrary-config
+                  key: DB_URL
+            - name: DB_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: ilibrary-config
+                  key: DB_SCHEMA
+            - name: KAFKA_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ilibrary-config
+                  key: KAFKA_HOST
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ilibrary-config-secret
+                  key: DB_USER
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: ilibrary-config-secret
+                  key: DB_PASS
+          ports:
+            - containerPort: {{ .Values.userservice.service.port }}
+              name: web
+          imagePullPolicy: IfNotPresent
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user-service-app
+  ports:
+    - protocol: TCP
+      port: {{ .Values.userservice.service.port }}
+      targetPort: web
+      name: web
+  type: {{ .Values.userservice.service.type }}

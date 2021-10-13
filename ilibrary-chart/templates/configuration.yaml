@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ilibrary-config
+data:
+  DB_URL: {{ .Values.db.url }}
+  DB_SCHEMA: {{ .Values.db.schema }}
+  KAFKA_HOST: {{ .Values.kafka.host }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ilibrary-config-secret
+type: Opaque
+data:
+  DB_USER: {{ .Values.db.username | b64enc }}
+  DB_PASS: {{ .Values.db.password | b64enc }}

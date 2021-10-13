@@ -1,0 +1,39 @@
+host: arch.homework
+
+userservice:
+  image: mvkoshenkova/user-service:v6
+  replicaCount: 1
+  service:
+    type: NodePort
+    port: 8080
+
+billingservice:
+  image: mvkoshenkova/billing-service:v2
+  replicaCount: 1
+  service:
+    type: NodePort
+    port: 8080
+
+notificationservice:
+  image: mvkoshenkova/notification-service:v3
+  replicaCount: 1
+  service:
+    type: NodePort
+    port: 8080
+
+orderservice:
+  image: mvkoshenkova/order-service:v5
+  replicaCount: 1
+  service:
+    type: NodePort
+    port: 8080
+
+
+db:
+  schema: public
+  url: jdbc:postgresql://postgres/ilibrary
+  username: postgres
+  password: postgres
+
+kafka:
+  host: kafka.default.svc.cluster.local:9092
